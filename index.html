@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2026 NCAA March Madness Bracket</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0e1a; color: #e0e6ff; min-height: 100vh; }
+
+/* ‚îÄ‚îÄ Setup Screen ‚îÄ‚îÄ */
+.setup-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+.setup-card { background: #131929; border: 1px solid #1e2d4a; border-radius: 16px; padding: 40px; width: 100%; max-width: 520px; }
+.setup-title { font-size: 2rem; font-weight: 800; text-align: center; background: linear-gradient(135deg, #ff6b00, #ff9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; }
+.setup-sub { text-align: center; color: #7a8aaa; font-size: 0.85rem; margin-bottom: 28px; }
+.player-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.player-num { width: 28px; height: 28px; border-radius: 50%; background: #1e2d4a; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7a8aaa; flex-shrink: 0; }
+.player-row.active .player-num { background: #ff6b00; color: #fff; }
+.player-input { flex: 1; background: #0a0e1a; border: 1px solid #1e2d4a; border-radius: 8px; padding: 10px 14px; color: #e0e6ff; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+.player-input:focus { border-color: #ff6b00; }
+.player-input::placeholder { color: #3a4a6a; }
+.btn-primary { width: 100%; margin-top: 20px; padding: 14px; background: linear-gradient(135deg, #ff6b00, #ff9500); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ‚îÄ‚îÄ Header ‚îÄ‚îÄ */
+.header { background: #0d1220; border-bottom: 1px solid #1e2d4a; padding: 0 16px; position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+.header-title { font-size: 1.1rem; font-weight: 800; background: linear-gradient(135deg, #ff6b00, #ff9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header-actions { display: flex; gap: 8px; }
+.btn-sm { padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #1e2d4a; background: #131929; color: #7a8aaa; transition: all 0.2s; }
+.btn-sm:hover { background: #1e2d4a; color: #e0e6ff; }
+.btn-sm.active { background: #ff6b00; border-color: #ff6b00; color: #fff; }
+.btn-sm.results-active { background: #16a34a; border-color: #16a34a; color: #fff; }
+.btn-sm.score-btn { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+/* ‚îÄ‚îÄ Player Tabs ‚îÄ‚îÄ */
+.player-tabs { display: flex; gap: 4px; padding: 8px 0; overflow-x: auto; }
+.player-tab { padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #1e2d4a; background: transparent; color: #7a8aaa; white-space: nowrap; transition: all 0.2s; }
+.player-tab:hover { border-color: #3a4a6a; color: #c0cce8; }
+.player-tab.active { background: #1e3a6e; border-color: #2563eb; color: #60a5fa; }
+.player-tab.results-tab { }
+.player-tab.results-tab.active { background: #14532d; border-color: #16a34a; color: #4ade80; }
+
+/* ‚îÄ‚îÄ Region Nav ‚îÄ‚îÄ */
+.region-nav { display: flex; gap: 4px; padding: 8px 16px; overflow-x: auto; background: #0a0e1a; border-bottom: 1px solid #1e2d4a; }
+.region-tab { padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; background: transparent; color: #7a8aaa; white-space: nowrap; transition: all 0.2s; }
+.region-tab:hover { color: #c0cce8; background: #131929; }
+.region-tab.active { background: #1e2d4a; border-color: #2563eb; color: #60a5fa; }
+
+/* ‚îÄ‚îÄ Main Content ‚îÄ‚îÄ */
+.main-content { padding: 16px; overflow-x: auto; }
+
+/* ‚îÄ‚îÄ Bracket Layout ‚îÄ‚îÄ */
+.bracket-region { display: flex; gap: 0; align-items: flex-start; }
+.bracket-region.mirrored { flex-direction: row-reverse; }
+.round-col { display: flex; flex-direction: column; }
+.round-label { font-size: 0.65rem; font-weight: 700; color: #3a4a6a; text-align: center; padding: 4px 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* ‚îÄ‚îÄ Game Wrapper (controls spacing) ‚îÄ‚îÄ */
+.game-wrapper { display: flex; align-items: center; justify-content: center; position: relative; }
+.game-wrapper.r64 { min-height: 64px; height: 64px; }
+.game-wrapper.r32 { min-height: 128px; height: 128px; }
+.game-wrapper.r16 { min-height: 256px; height: 256px; }
+.game-wrapper.r8  { min-height: 512px; height: 512px; }
+.game-wrapper.rf4 { min-height: 150px; height: 150px; }
+.game-wrapper.rc  { min-height: 80px; height: 80px; }
+
+/* ‚îÄ‚îÄ Connector Lines ‚îÄ‚îÄ */
+.connector-col { display: flex; flex-direction: column; width: 16px; }
+.connector-pair { display: flex; flex-direction: column; }
+.connector-pair.r64 { height: 128px; }
+.connector-pair.r32 { height: 256px; }
+.connector-pair.r16 { height: 512px; }
+.connector-top { flex: 1; border-right: 2px solid #1e2d4a; border-bottom: 2px solid #1e2d4a; }
+.connector-bottom { flex: 1; border-right: 2px solid #1e2d4a; border-top: 2px solid #1e2d4a; }
+.connector-arm { width: 16px; height: 2px; background: #1e2d4a; align-self: center; }
+
+/* ‚îÄ‚îÄ Game Card ‚îÄ‚îÄ */
+.game-card { width: 154px; border: 1px solid #1e2d4a; border-radius: 6px; overflow: hidden; background: #0d1523; flex-shrink: 0; }
+.game-card.ff-card { width: 154px; }
+
+.team-slot { display: flex; align-items: center; padding: 5px 8px; gap: 6px; cursor: pointer; transition: background 0.15s; min-height: 28px; position: relative; }
+.team-slot:hover:not(.disabled):not(.tbd) { background: #1e2d4a; }
+.team-slot.selected-pick { background: #1e3a6e !important; }
+.team-slot.selected-result { background: #14532d !important; }
+.team-slot.eliminated { opacity: 0.35; }
+.team-slot.tbd { cursor: default; opacity: 0.5; }
+.team-slot.disabled { cursor: default; }
+
+.team-slot + .team-slot { border-top: 1px solid #1e2d4a; }
+
+.seed-badge { font-size: 0.6rem; font-weight: 700; color: #7a8aaa; width: 16px; text-align: right; flex-shrink: 0; }
+.team-name { font-size: 0.72rem; font-weight: 500; color: #c0cce8; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.team-slot.selected-pick .team-name { color: #60a5fa; font-weight: 700; }
+.team-slot.selected-result .team-name { color: #4ade80; font-weight: 700; }
+.check-icon { font-size: 0.65rem; color: #4ade80; flex-shrink: 0; }
+.correct-icon { font-size: 0.65rem; color: #facc15; flex-shrink: 0; }
+
+/* ‚îÄ‚îÄ First Four ‚îÄ‚îÄ */
+.first-four-section { margin-bottom: 24px; }
+.first-four-title { font-size: 0.7rem; font-weight: 700; color: #ff6b00; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.first-four-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+.ff-group { display: flex; flex-direction: column; gap: 4px; }
+.ff-label { font-size: 0.6rem; color: #3a4a6a; }
+.ff-feeds { font-size: 0.55rem; color: #ff6b00; opacity: 0.7; }
+
+/* ‚îÄ‚îÄ Final Four ‚îÄ‚îÄ */
+.final-four-container { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.f4-layout { display: flex; align-items: center; gap: 32px; }
+.f4-side { display: flex; flex-direction: column; gap: 8px; }
+.f4-label { font-size: 0.65rem; font-weight: 700; color: #ff6b00; text-align: center; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.champ-label { font-size: 0.75rem; font-weight: 800; color: #facc15; text-align: center; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.champ-card { width: 180px; }
+.trophy { font-size: 2rem; text-align: center; margin-bottom: 8px; }
+.vs-divider { font-size: 0.7rem; color: #3a4a6a; font-weight: 700; }
+
+/* ‚îÄ‚îÄ Scoreboard ‚îÄ‚îÄ */
+.scoreboard-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.scoreboard-card { background: #131929; border: 1px solid #1e2d4a; border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.score-title { font-size: 1.3rem; font-weight: 800; color: #facc15; margin-bottom: 4px; }
+.score-sub { font-size: 0.75rem; color: #7a8aaa; margin-bottom: 20px; }
+.score-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; background: #0d1523; margin-bottom: 8px; border: 1px solid #1e2d4a; }
+.score-rank { font-size: 1.1rem; font-weight: 800; color: #7a8aaa; width: 24px; text-align: center; }
+.score-rank.gold { color: #facc15; }
+.score-rank.silver { color: #94a3b8; }
+.score-rank.bronze { color: #f97316; }
+.score-name { flex: 1; font-weight: 700; font-size: 0.95rem; }
+.score-total { font-size: 1.3rem; font-weight: 800; color: #60a5fa; }
+.score-breakdown { font-size: 0.68rem; color: #7a8aaa; line-height: 1.6; margin-top: 4px; }
+.score-possible { font-size: 0.68rem; color: #3a4a6a; }
+.btn-close { display: block; width: 100%; margin-top: 16px; padding: 10px; background: #1e2d4a; border: 1px solid #2a3d5a; border-radius: 8px; color: #e0e6ff; font-weight: 600; cursor: pointer; }
+.score-legend { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.score-legend-item { font-size: 0.68rem; color: #7a8aaa; }
+
+/* ‚îÄ‚îÄ Region Header ‚îÄ‚îÄ */
+.region-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.region-name-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.east-badge { background: #1e3a6e; color: #60a5fa; }
+.west-badge { background: #3b1f60; color: #c084fc; }
+.midwest-badge { background: #1f3a2a; color: #4ade80; }
+.south-badge { background: #3a1f1f; color: #f87171; }
+.champion-name { font-size: 0.7rem; color: #7a8aaa; }
+
+/* ‚îÄ‚îÄ Progress Bar ‚îÄ‚îÄ */
+.progress-bar { height: 2px; background: #1e2d4a; border-radius: 1px; margin-bottom: 2px; }
+.progress-fill { height: 100%; border-radius: 1px; background: linear-gradient(90deg, #2563eb, #60a5fa); transition: width 0.3s; }
+
+/* ‚îÄ‚îÄ Misc ‚îÄ‚îÄ */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #3a4a6a; gap: 12px; }
+.round-section-label { font-size: 0.62rem; font-weight: 700; color: #3a4a6a; text-align: center; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useMemo, useCallback } = React;
+
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// BRACKET DATA
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+
+const ALL_GAMES = {};
+
+function addGame(id, round, config) {
+  ALL_GAMES[id] = { id, round, ...config };
+}
+
+// First Four
+addGame('ff1', 0, { top: { id:'umbc', name:'UMBC', seed:16 }, bottom: { id:'howard', name:'Howard', seed:16 }, label:'Midwest 16-seed play-in', feederTo:'mw-64-1', feederSlot:'bottom' });
+addGame('ff2', 0, { top: { id:'pv', name:'Prairie View', seed:16 }, bottom: { id:'lehigh', name:'Lehigh', seed:16 }, label:'South 16-seed play-in', feederTo:'s-64-1', feederSlot:'bottom' });
+addGame('ff3', 0, { top: { id:'texas', name:'Texas', seed:11 }, bottom: { id:'ncst', name:'NC State', seed:11 }, label:'West 11-seed play-in', feederTo:'w-64-5', feederSlot:'bottom' });
+addGame('ff4', 0, { top: { id:'smu', name:'SMU', seed:11 }, bottom: { id:'miaoh', name:'Miami (OH)', seed:11 }, label:'Midwest 11-seed play-in', feederTo:'mw-64-5', feederSlot:'bottom' });
+
+// ‚îÄ‚îÄ EAST REGION ‚îÄ‚îÄ
+addGame('e-64-1', 1, { top:{id:'duke',name:'Duke',seed:1}, bottom:{id:'siena',name:'Siena',seed:16} });
+addGame('e-64-2', 1, { top:{id:'ohiost',name:'Ohio St.',seed:8}, bottom:{id:'tcu',name:'TCU',seed:9} });
+addGame('e-64-3', 1, { top:{id:'stjohns',name:"St. John's",seed:5}, bottom:{id:'uni',name:'N. Iowa',seed:12} });
+addGame('e-64-4', 1, { top:{id:'kansas',name:'Kansas',seed:4}, bottom:{id:'calbap',name:'Cal Baptist',seed:13} });
+addGame('e-64-5', 1, { top:{id:'louisville',name:'Louisville',seed:6}, bottom:{id:'soufla',name:'South Florida',seed:11} });
+addGame('e-64-6', 1, { top:{id:'michst',name:'Michigan St.',seed:3}, bottom:{id:'ndsu',name:'N. Dakota St.',seed:14} });
+addGame('e-64-7', 1, { top:{id:'ucla',name:'UCLA',seed:7}, bottom:{id:'ucf',name:'UCF',seed:10} });
+addGame('e-64-8', 1, { top:{id:'uconn',name:'UConn',seed:2}, bottom:{id:'furman',name:'Furman',seed:15} });
+addGame('e-32-1', 2, { topFrom:'e-64-1', bottomFrom:'e-64-2' });
+addGame('e-32-2', 2, { topFrom:'e-64-3', bottomFrom:'e-64-4' });
+addGame('e-32-3', 2, { topFrom:'e-64-5', bottomFrom:'e-64-6' });
+addGame('e-32-4', 2, { topFrom:'e-64-7', bottomFrom:'e-64-8' });
+addGame('e-16-1', 3, { topFrom:'e-32-1', bottomFrom:'e-32-2' });
+addGame('e-16-2', 3, { topFrom:'e-32-3', bottomFrom:'e-32-4' });
+addGame('e-8',   4, { topFrom:'e-16-1', bottomFrom:'e-16-2' });
+
+// ‚îÄ‚îÄ WEST REGION ‚îÄ‚îÄ
+addGame('w-64-1', 1, { top:{id:'arizona',name:'Arizona',seed:1}, bottom:{id:'liu',name:'LIU',seed:16} });
+addGame('w-64-2', 1, { top:{id:'villanova',name:'Villanova',seed:8}, bottom:{id:'utahst',name:'Utah St.',seed:9} });
+addGame('w-64-3', 1, { top:{id:'wisconsin',name:'Wisconsin',seed:5}, bottom:{id:'highpoint',name:'High Point',seed:12} });
+addGame('w-64-4', 1, { top:{id:'arkansas',name:'Arkansas',seed:4}, bottom:{id:'hawaii',name:'Hawaii',seed:13} });
+addGame('w-64-5', 1, { top:{id:'byu',name:'BYU',seed:6}, bottomFrom:'ff3' });
+addGame('w-64-6', 1, { top:{id:'gonzaga',name:'Gonzaga',seed:3}, bottom:{id:'kennesaw',name:'Kennesaw St.',seed:14} });
+addGame('w-64-7', 1, { top:{id:'miafl',name:'Miami (FL)',seed:7}, bottom:{id:'missouri',name:'Missouri',seed:10} });
+addGame('w-64-8', 1, { top:{id:'purdue',name:'Purdue',seed:2}, bottom:{id:'queens',name:'Queens (NC)',seed:15} });
+addGame('w-32-1', 2, { topFrom:'w-64-1', bottomFrom:'w-64-2' });
+addGame('w-32-2', 2, { topFrom:'w-64-3', bottomFrom:'w-64-4' });
+addGame('w-32-3', 2, { topFrom:'w-64-5', bottomFrom:'w-64-6' });
+addGame('w-32-4', 2, { topFrom:'w-64-7', bottomFrom:'w-64-8' });
+addGame('w-16-1', 3, { topFrom:'w-32-1', bottomFrom:'w-32-2' });
+addGame('w-16-2', 3, { topFrom:'w-32-3', bottomFrom:'w-32-4' });
+addGame('w-8',   4, { topFrom:'w-16-1', bottomFrom:'w-16-2' });
+
+// ‚îÄ‚îÄ MIDWEST REGION ‚îÄ‚îÄ
+addGame('mw-64-1', 1, { top:{id:'michigan',name:'Michigan',seed:1}, bottomFrom:'ff1' });
+addGame('mw-64-2', 1, { top:{id:'georgia',name:'Georgia',seed:8}, bottom:{id:'saintlouis',name:'Saint Louis',seed:9} });
+addGame('mw-64-3', 1, { top:{id:'textech',name:'Texas Tech',seed:5}, bottom:{id:'akron',name:'Akron',seed:12} });
+addGame('mw-64-4', 1, { top:{id:'alabama',name:'Alabama',seed:4}, bottom:{id:'hofstra',name:'Hofstra',seed:13} });
+addGame('mw-64-5', 1, { top:{id:'tennessee',name:'Tennessee',seed:6}, bottomFrom:'ff4' });
+addGame('mw-64-6', 1, { top:{id:'virginia',name:'Virginia',seed:3}, bottom:{id:'wrightst',name:'Wright St.',seed:14} });
+addGame('mw-64-7', 1, { top:{id:'kentucky',name:'Kentucky',seed:7}, bottom:{id:'santaclara',name:'Santa Clara',seed:10} });
+addGame('mw-64-8', 1, { top:{id:'iowast',name:'Iowa St.',seed:2}, bottom:{id:'tennst',name:'Tennessee St.',seed:15} });
+addGame('mw-32-1', 2, { topFrom:'mw-64-1', bottomFrom:'mw-64-2' });
+addGame('mw-32-2', 2, { topFrom:'mw-64-3', bottomFrom:'mw-64-4' });
+addGame('mw-32-3', 2, { topFrom:'mw-64-5', bottomFrom:'mw-64-6' });
+addGame('mw-32-4', 2, { topFrom:'mw-64-7', bottomFrom:'mw-64-8' });
+addGame('mw-16-1', 3, { topFrom:'mw-32-1', bottomFrom:'mw-32-2' });
+addGame('mw-16-2', 3, { topFrom:'mw-32-3', bottomFrom:'mw-32-4' });
+addGame('mw-8',   4, { topFrom:'mw-16-1', bottomFrom:'mw-16-2' });
+
+// ‚îÄ‚îÄ SOUTH REGION ‚îÄ‚îÄ
+addGame('s-64-1', 1, { top:{id:'florida',name:'Florida',seed:1}, bottomFrom:'ff2' });
+addGame('s-64-2', 1, { top:{id:'clemson',name:'Clemson',seed:8}, bottom:{id:'iowa',name:'Iowa',seed:9} });
+addGame('s-64-3', 1, { top:{id:'vanderbilt',name:'Vanderbilt',seed:5}, bottom:{id:'mcneese',name:'McNeese',seed:12} });
+addGame('s-64-4', 1, { top:{id:'nebraska',name:'Nebraska',seed:4}, bottom:{id:'troy',name:'Troy',seed:13} });
+addGame('s-64-5', 1, { top:{id:'unc',name:'North Carolina',seed:6}, bottom:{id:'vcu',name:'VCU',seed:11} });
+addGame('s-64-6', 1, { top:{id:'illinois',name:'Illinois',seed:3}, bottom:{id:'penn',name:'Penn',seed:14} });
+addGame('s-64-7', 1, { top:{id:'saintmarys',name:"Saint Mary's",seed:7}, bottom:{id:'texam',name:'Texas A&M',seed:10} });
+addGame('s-64-8', 1, { top:{id:'houston',name:'Houston',seed:2}, bottom:{id:'idaho',name:'Idaho',seed:15} });
+addGame('s-32-1', 2, { topFrom:'s-64-1', bottomFrom:'s-64-2' });
+addGame('s-32-2', 2, { topFrom:'s-64-3', bottomFrom:'s-64-4' });
+addGame('s-32-3', 2, { topFrom:'s-64-5', bottomFrom:'s-64-6' });
+addGame('s-32-4', 2, { topFrom:'s-64-7', bottomFrom:'s-64-8' });
+addGame('s-16-1', 3, { topFrom:'s-32-1', bottomFrom:'s-32-2' });
+addGame('s-16-2', 3, { topFrom:'s-32-3', bottomFrom:'s-32-4' });
+addGame('s-8',   4, { topFrom:'s-16-1', bottomFrom:'s-16-2' });
+
+// Final Four (East vs West, South vs Midwest)
+addGame('f4-1', 5, { topFrom:'e-8', bottomFrom:'w-8', label:'East vs West' });
+addGame('f4-2', 5, { topFrom:'s-8', bottomFrom:'mw-8', label:'South vs Midwest' });
+addGame('champ', 6, { topFrom:'f4-1', bottomFrom:'f4-2', label:'National Championship' });
+
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// REGION CONFIG
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+const REGIONS = {
+  east:    { name:'East',    badge:'east-badge',    r64:['e-64-1','e-64-2','e-64-3','e-64-4','e-64-5','e-64-6','e-64-7','e-64-8'], r32:['e-32-1','e-32-2','e-32-3','e-32-4'], r16:['e-16-1','e-16-2'], r8:'e-8' },
+  west:    { name:'West',    badge:'west-badge',    r64:['w-64-1','w-64-2','w-64-3','w-64-4','w-64-5','w-64-6','w-64-7','w-64-8'], r32:['w-32-1','w-32-2','w-32-3','w-32-4'], r16:['w-16-1','w-16-2'], r8:'w-8' },
+  midwest: { name:'Midwest', badge:'midwest-badge', r64:['mw-64-1','mw-64-2','mw-64-3','mw-64-4','mw-64-5','mw-64-6','mw-64-7','mw-64-8'], r32:['mw-32-1','mw-32-2','mw-32-3','mw-32-4'], r16:['mw-16-1','mw-16-2'], r8:'mw-8' },
+  south:   { name:'South',   badge:'south-badge',   r64:['s-64-1','s-64-2','s-64-3','s-64-4','s-64-5','s-64-6','s-64-7','s-64-8'], r32:['s-32-1','s-32-2','s-32-3','s-32-4'], r16:['s-16-1','s-16-2'], r8:'s-8' },
+};
+
+const ROUND_LABELS = { 0:'First Four', 1:'Round of 64', 2:'Round of 32', 3:'Sweet 16', 4:'Elite Eight', 5:'Final Four', 6:'Championship' };
+const ROUND_POINTS = { 0:1, 1:1, 2:2, 3:4, 4:8, 5:16, 6:32 };
+
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// HELPERS
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+function getTeamForSlot(gameId, slot, picks) {
+  const game = ALL_GAMES[gameId];
+  if (!game) return null;
+  const direct = game[slot]; // e.g. game.top or game.bottom
+  if (direct) return direct;
+  const fromId = game[slot + 'From'];
+  if (!fromId) return null;
+  const winnerId = picks[fromId];
+  if (!winnerId) return null;
+  // Find the team in the source game
+  const sourceGame = ALL_GAMES[fromId];
+  if (!sourceGame) return null;
+  const topTeam = getTeamForSlot(fromId, 'top', picks);
+  const bottomTeam = getTeamForSlot(fromId, 'bottom', picks);
+  if (topTeam && topTeam.id === winnerId) return topTeam;
+  if (bottomTeam && bottomTeam.id === winnerId) return bottomTeam;
+  return null;
+}
+
+function getWinner(gameId, picks) {
+  if (!picks[gameId]) return null;
+  const winnerId = picks[gameId];
+  const topTeam = getTeamForSlot(gameId, 'top', picks);
+  const bottomTeam = getTeamForSlot(gameId, 'bottom', picks);
+  if (topTeam && topTeam.id === winnerId) return topTeam;
+  if (bottomTeam && bottomTeam.id === winnerId) return bottomTeam;
+  return null;
+}
+
+function calcScore(playerPicks, results) {
+  let total = 0;
+  const breakdown = { 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
+  Object.keys(ALL_GAMES).forEach(gameId => {
+    const game = ALL_GAMES[gameId];
+    const resultWinnerId = results[gameId];
+    const playerWinnerId = playerPicks[gameId];
+    if (resultWinnerId && playerWinnerId && resultWinnerId === playerWinnerId) {
+      const pts = ROUND_POINTS[game.round];
+      total += pts;
+      breakdown[game.round] = (breakdown[game.round] || 0) + pts;
+    }
+  });
+  return { total, breakdown };
+}
+
+function countPicks(picks) {
+  return Object.keys(picks).length;
+}
+
+function totalPossiblePicks() {
+  return Object.keys(ALL_GAMES).length; // 67
+}
+
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// COMPONENTS
+// ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+
+function TeamSlot({ team, isSelected, isEliminated, isTbd, onPick, mode, isCorrect }) {
+  const cls = ['team-slot'];
+  if (isTbd) cls.push('tbd');
+  else if (isSelected && mode === 'picks') cls.push('selected-pick');
+  else if (isSelected && mode === 'results') cls.push('selected-result');
+  if (isEliminated) cls.push('eliminated');
+  if (!team || isTbd) cls.push('disabled');
+
+  return (
+    <div className={cls.join(' ')} onClick={(!isTbd && team) ? onPick : undefined}>
+      {team ? (
+        <>
+          <span className="seed-badge">{team.seed}</span>
+          <span className="team-name">{team.name}</span>
+          {isSelected && mode === 'results' && <span className="check-icon">‚úì</span>}
+          {isCorrect && mode === 'picks' && <span className="correct-icon">‚òÖ</span>}
+        </>
+      ) : (
+        <>
+          <span className="seed-badge">?</span>
+          <span className="team-name" style={{color:'#3a4a6a',fontStyle:'italic'}}>TBD</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function GameCard({ gameId, picks, onPick, mode, results, style, cardStyle }) {
+  const game = ALL_GAMES[gameId];
+  if (!game) return null;
+
+  const topTeam    = getTeamForSlot(gameId, 'top', picks);
+  const bottomTeam = getTeamForSlot(gameId, 'bottom', picks);
+  const winnerId   = picks[gameId];
+  const resultId   = results[gameId];
+
+  const topSelected    = winnerId === topTeam?.id;
+  const bottomSelected = winnerId === bottomTeam?.id;
+  const topElim        = !topSelected && !!winnerId;
+  const bottomElim     = !bottomSelected && !!winnerId;
+  const topCorrect     = mode === 'picks' && resultId && resultId === topTeam?.id && topSelected;
+  const bottomCorrect  = mode === 'picks' && resultId && resultId === bottomTeam?.id && bottomSelected;
+
+  // Slots are tbd if team can't be resolved yet
+  const topTbd    = !topTeam && !game.top;
+  const bottomTbd = !bottomTeam && !game.bottom;
+
+  return (
+    <div className="game-card" style={cardStyle}>
+      <TeamSlot
+        team={topTeam}
+        isSelected={topSelected}
+        isEliminated={topElim}
+        isTbd={topTbd}
+        mode={mode}
+        isCorrect={topCorrect}
+        onPick={() => topTeam && onPick(gameId, topTeam.id)}
+      />
+      <TeamSlot
+        team={bottomTeam}
+        isSelected={bottomSelected}
+        isEliminated={bottomElim}
+        isTbd={bottomTbd}
+        mode={mode}
+        isCorrect={bottomCorrect}
+        onPick={() => bottomTeam && onPick(gameId, bottomTeam.id)}
+      />
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ CONNECTOR BETWEEN ROUNDS ‚îÄ‚îÄ
+function ConnectorCol({ count, wrapperClass }) {
+  return (
+    <div className="connector-col">
+      {Array.from({length: count}).map((_, i) => (
+        <div key={i} className={`connector-pair ${wrapperClass}`}>
+          <div className="connector-top" />
+          <div className="connector-bottom" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ REGION BRACKET ‚îÄ‚îÄ
+function RegionBracket({ regionKey, picks, onPick, mode, results }) {
+  const region = REGIONS[regionKey];
+  const { r64, r32, r16, r8, name, badge } = region;
+
+  const e8Winner = getWinner(r8, picks);
+  const e8ResultWinner = getWinner(r8, results);
+
+  return (
+    <div>
+      <div className="region-header">
+        <span className={`region-name-badge ${badge}`}>{name} Region</span>
+        {e8Winner && (
+          <span className="champion-name">
+            Regional picks leader: <strong style={{color:'#e0e6ff'}}>{e8Winner.name}</strong>
+          </span>
+        )}
+      </div>
+      <div className="bracket-region" style={{overflowX:'auto', paddingBottom:8}}>
+        {/* R64 Column */}
+        <div>
+          <div className="round-label">R64</div>
+          <div className="round-col">
+            {r64.map(gid => (
+              <div key={gid} className="game-wrapper r64">
+                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Connector r64‚Üír32 */}
+        <ConnectorCol count={4} wrapperClass="r64" />
+
+        {/* R32 Column */}
+        <div>
+          <div className="round-label">R32</div>
+          <div className="round-col">
+            {r32.map(gid => (
+              <div key={gid} className="game-wrapper r32">
+                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Connector r32‚Üír16 */}
+        <ConnectorCol count={2} wrapperClass="r32" />
+
+        {/* S16 Column */}
+        <div>
+          <div className="round-label">Sweet 16</div>
+          <div className="round-col">
+            {r16.map(gid => (
+              <div key={gid} className="game-wrapper r16">
+                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Connector r16‚Üír8 */}
+        <ConnectorCol count={1} wrapperClass="r16" />
+
+        {/* E8 Column */}
+        <div>
+          <div className="round-label">Elite 8</div>
+          <div className="round-col">
+            <div className="game-wrapper r8">
+              <GameCard gameId={r8} picks={picks} onPick={onPick} mode={mode} results={results} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ FIRST FOUR VIEW ‚îÄ‚îÄ
+function FirstFourView({ picks, onPick, mode, results }) {
+  const ffGames = ['ff1','ff2','ff3','ff4'];
+  return (
+    <div className="first-four-section">
+      <div className="first-four-title">‚ö° First Four ‚Äî Play-In Games (Dayton, OH)</div>
+      <div className="first-four-grid">
+        {ffGames.map(gid => {
+          const game = ALL_GAMES[gid];
+          return (
+            <div key={gid} className="ff-group">
+              <div className="ff-label">{game.label}</div>
+              <GameCard
+                gameId={gid}
+                picks={picks}
+                onPick={onPick}
+                mode={mode}
+                results={results}
+              />
+              <div className="ff-feeds">‚Üí feeds into {game.feederTo}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ FINAL FOUR VIEW ‚îÄ‚îÄ
+function FinalFourView({ picks, onPick, mode, results }) {
+  return (
+    <div className="final-four-container">
+      <div className="trophy">üèÜ</div>
+
+      <div className="f4-layout">
+        <div className="f4-side">
+          <div className="f4-label">Semifinal 1<br/><small style={{fontSize:'0.55rem',opacity:0.7}}>East vs West</small></div>
+          <GameCard gameId="f4-1" picks={picks} onPick={onPick} mode={mode} results={results} />
+        </div>
+
+        <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:12}}>
+          <div className="champ-label">üèÜ Championship<br/><small style={{fontSize:'0.6rem'}}>Apr 6 ¬∑ Indianapolis</small></div>
+          <GameCard
+            gameId="champ"
+            picks={picks}
+            onPick={onPick}
+            mode={mode}
+            results={results}
+            cardStyle={{width:180}}
+          />
+          {picks['champ'] && (
+            <div style={{fontSize:'0.75rem', color:'#facc15', fontWeight:700, textAlign:'center'}}>
+              üèÜ {getWinner('champ', picks)?.name}
+            </div>
+          )}
+        </div>
+
+        <div className="f4-side">
+          <div className="f4-label">Semifinal 2<br/><small style={{fontSize:'0.55rem',opacity:0.7}}>South vs Midwest</small></div>
+          <GameCard gameId="f4-2" picks={picks} onPick={onPick} mode={mode} results={results} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ SCOREBOARD ‚îÄ‚îÄ
+function Scoreboard({ players, allPicks, results, onClose }) {
+  const scores = players.map((name, i) => {
+    const { total, breakdown } = calcScore(allPicks[i] || {}, results);
+    const picked = countPicks(allPicks[i] || {});
+    return { name, total, breakdown, picked };
+  }).sort((a,b) => b.total - a.total);
+
+  const rankEmojis = ['ü•á','ü•à','ü•â'];
+  const rankClasses = ['gold','silver','bronze'];
+
+  return (
+    <div className="scoreboard-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="scoreboard-card">
+        <div className="score-title">üìä Scoreboard</div>
+        <div className="score-sub">Based on actual results entered ¬∑ Max {Object.values(ROUND_POINTS).reduce((a,b) => a+b,0) * 3 + 32 + 16 + 8 + 4 + 2 + 1} pts</div>
+        <div className="score-legend">
+          {Object.entries(ROUND_POINTS).map(([r, pts]) => (
+            <span key={r} className="score-legend-item">{ROUND_LABELS[r]}: {pts}pt{pts>1?'s':''}</span>
+          ))}
+        </div>
+        {scores.map((s, i) => {
+          const rankCls = i < 3 ? rankClasses[i] : '';
+          return (
+            <div key={s.name} className="score-row">
+              <div className={`score-rank ${rankCls}`}>{i < 3 ? rankEmojis[i] : (i+1)}</div>
+              <div style={{flex:1}}>
+                <div className="score-name">{s.name}</div>
+                <div className="score-breakdown">
+                  {Object.entries(s.breakdown).filter(([,v])=>v>0).map(([r,v]) =>
+                    `${ROUND_LABELS[r]}: ${v}pts`
+                  ).join('  ¬∑  ') || 'No points yet'}
+                </div>
+                <div className="score-possible">{s.picked} / {totalPossiblePicks()} picks made</div>
+              </div>
+              <div className="score-total">{s.total}</div>
+            </div>
+          );
+        })}
+        <button className="btn-close" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ SETUP SCREEN ‚îÄ‚îÄ
+function SetupScreen({ onStart }) {
+  const [names, setNames] = useState(['','','','','']);
+
+  const activePlayers = names.filter(n => n.trim().length > 0);
+
+  const handleStart = () => {
+    const valid = names.map(n => n.trim()).filter(Boolean);
+    if (valid.length > 0) onStart(valid);
+  };
+
+  return (
+    <div className="setup-screen">
+      <div className="setup-card">
+        <div className="setup-title">üèÄ March Madness 2026</div>
+        <div className="setup-sub">NCAA Tournament Bracket Challenge ¬∑ Up to 5 players</div>
+
+        {names.map((name, i) => (
+          <div key={i} className={`player-row ${name.trim() ? 'active' : ''}`}>
+            <div className="player-num">{i+1}</div>
+            <input
+              className="player-input"
+              placeholder={`Player ${i+1} name${i === 0 ? ' (required)' : ' (optional)'}`}
+              value={name}
+              onChange={e => {
+                const next = [...names];
+                next[i] = e.target.value;
+                setNames(next);
+              }}
+              onKeyDown={e => e.key === 'Enter' && handleStart()}
+            />
+          </div>
+        ))}
+
+        <button className="btn-primary" onClick={handleStart} disabled={activePlayers.length === 0}>
+          Start Bracket Challenge ‚Üí
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ MAIN APP ‚îÄ‚îÄ
+function App() {
+  const [screen, setScreen] = useState('setup'); // 'setup' | 'bracket'
+  const [players, setPlayers] = useState([]);
+  const [activeTab, setActiveTab] = useState(0); // 0..N-1 = players, N = results
+  const [activeRegion, setActiveRegion] = useState('firstfour');
+  const [allPicks, setAllPicks] = useState([]); // array of pick maps per player
+  const [results, setResults] = useState({});   // actual results map
+  const [showScore, setShowScore] = useState(false);
+
+  // Load from localStorage
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('mm2026') || 'null');
+      if (saved && saved.players) {
+        setPlayers(saved.players);
+        setAllPicks(saved.allPicks || saved.players.map(() => ({})));
+        setResults(saved.results || {});
+        setScreen('bracket');
+      }
+    } catch(e) {}
+  }, []);
+
+  // Save to localStorage
+  useEffect(() => {
+    if (screen === 'bracket') {
+      localStorage.setItem('mm2026', JSON.stringify({ players, allPicks, results }));
+    }
+  }, [players, allPicks, results, screen]);
+
+  const handleStart = (validPlayers) => {
+    setPlayers(validPlayers);
+    setAllPicks(validPlayers.map(() => ({})));
+    setResults({});
+    setActiveTab(0);
+    setScreen('bracket');
+  };
+
+  const handleReset = () => {
+    if (confirm('Reset all picks and results? This cannot be undone.')) {
+      localStorage.removeItem('mm2026');
+      setScreen('setup');
+      setPlayers([]);
+      setAllPicks([]);
+      setResults({});
+    }
+  };
+
+  const isResultsMode = activeTab === players.length;
+
+  const currentPicks = isResultsMode ? results : (allPicks[activeTab] || {});
+
+  const handlePick = useCallback((gameId, teamId) => {
+    if (isResultsMode) {
+      setResults(prev => {
+        const next = { ...prev };
+        if (next[gameId] === teamId) delete next[gameId]; // toggle off
+        else next[gameId] = teamId;
+        // Cascade: if a game winner changes, clear downstream picks
+        clearDownstream(next, gameId);
+        return next;
+      });
+    } else {
+      const pi = activeTab;
+      setAllPicks(prev => {
+        const next = prev.map((p, i) => {
+          if (i !== pi) return p;
+          const updated = { ...p };
+          if (updated[gameId] === teamId) delete updated[gameId];
+          else updated[gameId] = teamId;
+          clearDownstream(updated, gameId);
+          return updated;
+        });
+        return next;
+      });
+    }
+  }, [isResultsMode, activeTab]);
+
+  function clearDownstream(picksObj, changedGameId) {
+    // Find games that depend on changedGameId and clear their picks
+    Object.keys(ALL_GAMES).forEach(gid => {
+      const g = ALL_GAMES[gid];
+      if (g.topFrom === changedGameId || g.bottomFrom === changedGameId) {
+        const winnerId = picksObj[gid];
+        if (winnerId) {
+          // Check if the winner is still valid
+          const topTeam = getTeamForSlot(gid, 'top', picksObj);
+          const bottomTeam = getTeamForSlot(gid, 'bottom', picksObj);
+          if ((!topTeam || topTeam.id !== winnerId) && (!bottomTeam || bottomTeam.id !== winnerId)) {
+            delete picksObj[gid];
+            clearDownstream(picksObj, gid);
+          }
+        }
+      }
+    });
+  }
+
+  const regionTabs = [
+    { key: 'firstfour', label: '‚ö° First Four' },
+    { key: 'east',    label: 'East' },
+    { key: 'west',    label: 'West' },
+    { key: 'midwest', label: 'Midwest' },
+    { key: 'south',   label: 'South' },
+    { key: 'finalfour', label: 'üèÜ Final Four' },
+  ];
+
+  const totalPicks = isResultsMode
+    ? countPicks(results)
+    : countPicks(allPicks[activeTab] || {});
+
+  const pct = Math.round((totalPicks / totalPossiblePicks()) * 100);
+
+  if (screen === 'setup') return <SetupScreen onStart={handleStart} />;
+
+  return (
+    <div>
+      {showScore && (
+        <Scoreboard
+          players={players}
+          allPicks={allPicks}
+          results={results}
+          onClose={() => setShowScore(false)}
+        />
+      )}
+
+      <div className="header">
+        <div className="header-top">
+          <div className="header-title">üèÄ March Madness 2026</div>
+          <div className="header-actions">
+            <button className="btn-sm score-btn" onClick={() => setShowScore(true)}>üìä Scores</button>
+            <button className="btn-sm" onClick={handleReset}>‚Ü∫ Reset</button>
+          </div>
+        </div>
+
+        <div className="player-tabs">
+          {players.map((name, i) => (
+            <button
+              key={i}
+              className={`player-tab ${activeTab === i ? 'active' : ''}`}
+              onClick={() => setActiveTab(i)}
+            >
+              {name}
+            </button>
+          ))}
+          <button
+            className={`player-tab results-tab ${isResultsMode ? 'active' : ''}`}
+            onClick={() => setActiveTab(players.length)}
+          >
+            üìã Actual Results
+          </button>
+        </div>
+
+        <div style={{padding:'6px 0 8px', display:'flex', alignItems:'center', gap:10}}>
+          <div className="progress-bar" style={{flex:1}}>
+            <div className="progress-fill" style={{width: pct + '%'}} />
+          </div>
+          <span style={{fontSize:'0.65rem', color:'#7a8aaa', whiteSpace:'nowrap'}}>
+            {isResultsMode ? 'Results' : players[activeTab]}: {totalPicks}/{totalPossiblePicks()} picks
+          </span>
+        </div>
+      </div>
+
+      <div className="region-nav">
+        {regionTabs.map(t => (
+          <button
+            key={t.key}
+            className={`region-tab ${activeRegion === t.key ? 'active' : ''}`}
+            onClick={() => setActiveRegion(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="main-content">
+        {activeRegion === 'firstfour' && (
+          <FirstFourView
+            picks={currentPicks}
+            onPick={handlePick}
+            mode={isResultsMode ? 'results' : 'picks'}
+            results={results}
+          />
+        )}
+        {['east','west','midwest','south'].includes(activeRegion) && (
+          <RegionBracket
+            regionKey={activeRegion}
+            picks={currentPicks}
+            onPick={handlePick}
+            mode={isResultsMode ? 'results' : 'picks'}
+            results={results}
+          />
+        )}
+        {activeRegion === 'finalfour' && (
+          <FinalFourView
+            picks={currentPicks}
+            onPick={handlePick}
+            mode={isResultsMode ? 'results' : 'picks'}
+            results={results}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
