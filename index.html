@@ -60,6 +60,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .round-col { display: flex; flex-direction: column; }
 .round-label { font-size: 0.65rem; font-weight: 700; color: #3a4a6a; text-align: center; padding: 4px 8px; letter-spacing: 0.05em; text-transform: uppercase; }
 
+/* ‚îÄ‚îÄ Lock Controls ‚îÄ‚îÄ */
+.lock-btn { display: block; margin: 0 auto 4px; padding: 2px 7px; font-size: 0.58rem; font-weight: 700; border: 1px solid #3a4a6a; border-radius: 4px; background: #131929; color: #7a8aaa; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.lock-btn:hover { background: #1e2d4a; color: #facc15; border-color: #facc15; }
+.locked-badge { display: block; text-align: center; font-size: 0.6rem; color: #facc15; font-weight: 700; padding: 2px 0 4px; letter-spacing: 0.03em; }
+
 /* ‚îÄ‚îÄ Game Wrapper (controls spacing) ‚îÄ‚îÄ */
 .game-wrapper { display: flex; align-items: center; justify-content: center; position: relative; }
 .game-wrapper.r64 { min-height: 64px; height: 64px; }
@@ -82,14 +87,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* ‚îÄ‚îÄ Game Card ‚îÄ‚îÄ */
 .game-card { width: 154px; border: 1px solid #1e2d4a; border-radius: 6px; overflow: hidden; background: #0d1523; flex-shrink: 0; }
 .game-card.ff-card { width: 154px; }
+.game-card.locked-card { border-color: #facc1540; }
 
 .team-slot { display: flex; align-items: center; padding: 5px 8px; gap: 6px; cursor: pointer; transition: background 0.15s; min-height: 28px; position: relative; }
-.team-slot:hover:not(.disabled):not(.tbd) { background: #1e2d4a; }
+.team-slot:hover:not(.disabled):not(.tbd):not(.locked-slot) { background: #1e2d4a; }
 .team-slot.selected-pick { background: #1e3a6e !important; }
 .team-slot.selected-result { background: #14532d !important; }
 .team-slot.eliminated { opacity: 0.35; }
 .team-slot.tbd { cursor: default; opacity: 0.5; }
 .team-slot.disabled { cursor: default; }
+.team-slot.locked-slot { cursor: not-allowed; }
 
 .team-slot + .team-slot { border-top: 1px solid #1e2d4a; }
 
@@ -99,6 +106,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .team-slot.selected-result .team-name { color: #4ade80; font-weight: 700; }
 .check-icon { font-size: 0.65rem; color: #4ade80; flex-shrink: 0; }
 .correct-icon { font-size: 0.65rem; color: #facc15; flex-shrink: 0; }
+.lock-icon-sm { font-size: 0.5rem; color: #facc1555; flex-shrink: 0; }
 
 /* ‚îÄ‚îÄ First Four ‚îÄ‚îÄ */
 .first-four-section { margin-bottom: 24px; }
@@ -129,11 +137,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .score-rank.silver { color: #94a3b8; }
 .score-rank.bronze { color: #f97316; }
 .score-name { flex: 1; font-weight: 700; font-size: 0.95rem; }
-.score-total { font-size: 1.3rem; font-weight: 800; color: #60a5fa; }
+.score-total { font-size: 1.3rem; font-weight: 800; }
+.score-total.pos { color: #4ade80; }
+.score-total.neg { color: #f87171; }
+.score-total.zero { color: #7a8aaa; }
 .score-breakdown { font-size: 0.68rem; color: #7a8aaa; line-height: 1.6; margin-top: 4px; }
 .score-possible { font-size: 0.68rem; color: #3a4a6a; }
 .btn-close { display: block; width: 100%; margin-top: 16px; padding: 10px; background: #1e2d4a; border: 1px solid #2a3d5a; border-radius: 8px; color: #e0e6ff; font-weight: 600; cursor: pointer; }
-.score-legend { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.score-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; margin-bottom: 14px; }
 .score-legend-item { font-size: 0.68rem; color: #7a8aaa; }
 
 /* ‚îÄ‚îÄ Region Header ‚îÄ‚îÄ */
@@ -152,6 +163,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* ‚îÄ‚îÄ Misc ‚îÄ‚îÄ */
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #3a4a6a; gap: 12px; }
 .round-section-label { font-size: 0.62rem; font-weight: 700; color: #3a4a6a; text-align: center; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ‚îÄ‚îÄ Overview ‚îÄ‚îÄ */
+.overview-container { display: flex; flex-direction: column; gap: 20px; }
+.overview-round { background: #0d1523; border: 1px solid #1e2d4a; border-radius: 10px; overflow: hidden; }
+.overview-round-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 9px 14px; background: #131929; color: #facc15; border-bottom: 1px solid #1e2d4a; display: flex; align-items: center; gap: 8px; }
+.overview-round-meta { font-size: 0.62rem; color: #7a8aaa; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.overview-table-wrap { overflow-x: auto; }
+.overview-table { width: 100%; border-collapse: collapse; font-size: 0.71rem; }
+.overview-table th { padding: 5px 10px; text-align: left; font-size: 0.62rem; font-weight: 700; color: #7a8aaa; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #1e2d4a; background: #0a0e1a; white-space: nowrap; }
+.overview-table td { padding: 4px 10px; border-bottom: 1px solid #1e2d4a1a; vertical-align: middle; }
+.overview-table tr:last-child td { border-bottom: none; }
+.overview-table tr:hover td { background: #ffffff06; }
+.ov-game-col { min-width: 150px; }
+.ov-player-col { min-width: 95px; white-space: nowrap; }
+.ov-result-col { min-width: 95px; white-space: nowrap; }
+.ov-teams { display: flex; flex-direction: column; gap: 0; line-height: 1.35; }
+.ov-team { color: #c0cce8; font-size: 0.67rem; }
+.ov-seed { color: #7a8aaa; font-size: 0.58rem; margin-right: 2px; }
+.ov-vs { font-size: 0.5rem; color: #3a4a6a; margin: 0 0; }
+.ov-correct-cell { background: #14532d30 !important; }
+.ov-wrong-cell { background: #450a0a30 !important; }
+.ov-pick-name { font-weight: 500; }
+.ov-pick-correct { color: #4ade80; font-weight: 700; }
+.ov-pick-wrong { color: #f87171; }
+.ov-pick-seed { color: #7a8aaa; font-size: 0.6rem; margin-right: 2px; }
+.ov-dollar { font-size: 0.6rem; margin-left: 3px; }
+.ov-dollar-pos { color: #4ade80; }
+.ov-dollar-neg { color: #f87171; }
+.ov-summary-row td { background: #131929; font-weight: 700; font-size: 0.72rem; border-top: 1px solid #1e2d4a; }
 </style>
 </head>
 <body>
@@ -243,13 +283,13 @@ addGame('s-16-1', 3, { topFrom:'s-32-1', bottomFrom:'s-32-2' });
 addGame('s-16-2', 3, { topFrom:'s-32-3', bottomFrom:'s-32-4' });
 addGame('s-8',   4, { topFrom:'s-16-1', bottomFrom:'s-16-2' });
 
-// Final Four (East vs West, South vs Midwest)
+// Final Four
 addGame('f4-1', 5, { topFrom:'e-8', bottomFrom:'w-8', label:'East vs West' });
 addGame('f4-2', 5, { topFrom:'s-8', bottomFrom:'mw-8', label:'South vs Midwest' });
 addGame('champ', 6, { topFrom:'f4-1', bottomFrom:'f4-2', label:'National Championship' });
 
 // ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-// REGION CONFIG
+// REGIONS + SCORING
 // ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 const REGIONS = {
   east:    { name:'East',    badge:'east-badge',    r64:['e-64-1','e-64-2','e-64-3','e-64-4','e-64-5','e-64-6','e-64-7','e-64-8'], r32:['e-32-1','e-32-2','e-32-3','e-32-4'], r16:['e-16-1','e-16-2'], r8:'e-8' },
@@ -259,7 +299,11 @@ const REGIONS = {
 };
 
 const ROUND_LABELS = { 0:'First Four', 1:'Round of 64', 2:'Round of 32', 3:'Sweet 16', 4:'Elite Eight', 5:'Final Four', 6:'Championship' };
-const ROUND_POINTS = { 0:1, 1:1, 2:2, 3:4, 4:8, 5:16, 6:32 };
+const ROUND_SHORT  = { 0:'FF', 1:'R64', 2:'R32', 3:'S16', 4:'E8', 5:'F4', 6:'Champ' };
+
+// Money scoring: correct / wrong penalty per round
+const MONEY_CORRECT = { 0:1,  1:1,  2:1,  3:5,  4:5,  5:10, 6:50 };
+const MONEY_WRONG   = { 0:2,  1:2,  2:2,  3:10, 4:10, 5:10, 6:0  };
 
 // ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 // HELPERS
@@ -267,15 +311,12 @@ const ROUND_POINTS = { 0:1, 1:1, 2:2, 3:4, 4:8, 5:16, 6:32 };
 function getTeamForSlot(gameId, slot, picks) {
   const game = ALL_GAMES[gameId];
   if (!game) return null;
-  const direct = game[slot]; // e.g. game.top or game.bottom
+  const direct = game[slot];
   if (direct) return direct;
   const fromId = game[slot + 'From'];
   if (!fromId) return null;
   const winnerId = picks[fromId];
   if (!winnerId) return null;
-  // Find the team in the source game
-  const sourceGame = ALL_GAMES[fromId];
-  if (!sourceGame) return null;
   const topTeam = getTeamForSlot(fromId, 'top', picks);
   const bottomTeam = getTeamForSlot(fromId, 'bottom', picks);
   if (topTeam && topTeam.id === winnerId) return topTeam;
@@ -295,18 +336,32 @@ function getWinner(gameId, picks) {
 
 function calcScore(playerPicks, results) {
   let total = 0;
-  const breakdown = { 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
+  const byRound = {};
   Object.keys(ALL_GAMES).forEach(gameId => {
     const game = ALL_GAMES[gameId];
-    const resultWinnerId = results[gameId];
-    const playerWinnerId = playerPicks[gameId];
-    if (resultWinnerId && playerWinnerId && resultWinnerId === playerWinnerId) {
-      const pts = ROUND_POINTS[game.round];
+    const resultId = results[gameId];
+    const pickId   = playerPicks[gameId];
+    if (!resultId || !pickId) return;
+    const r = game.round;
+    if (!byRound[r]) byRound[r] = { correct:0, wrong:0, net:0 };
+    if (resultId === pickId) {
+      const pts = MONEY_CORRECT[r] || 1;
       total += pts;
-      breakdown[game.round] = (breakdown[game.round] || 0) + pts;
+      byRound[r].correct++;
+      byRound[r].net += pts;
+    } else {
+      const pts = MONEY_WRONG[r] || 2;
+      total -= pts;
+      byRound[r].wrong++;
+      byRound[r].net -= pts;
     }
   });
-  return { total, breakdown };
+  return { total, byRound };
+}
+
+function formatMoney(n) {
+  if (n === 0) return '$0';
+  return n > 0 ? `+$${n}` : `-$${Math.abs(n)}`;
 }
 
 function countPicks(picks) {
@@ -314,29 +369,33 @@ function countPicks(picks) {
 }
 
 function totalPossiblePicks() {
-  return Object.keys(ALL_GAMES).length; // 67
+  return Object.keys(ALL_GAMES).length;
 }
 
 // ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 // COMPONENTS
 // ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 
-function TeamSlot({ team, isSelected, isEliminated, isTbd, onPick, mode, isCorrect }) {
+function TeamSlot({ team, isSelected, isEliminated, isTbd, onPick, mode, isCorrect, locked }) {
   const cls = ['team-slot'];
   if (isTbd) cls.push('tbd');
   else if (isSelected && mode === 'picks') cls.push('selected-pick');
   else if (isSelected && mode === 'results') cls.push('selected-result');
   if (isEliminated) cls.push('eliminated');
   if (!team || isTbd) cls.push('disabled');
+  if (locked && team && !isTbd) cls.push('locked-slot');
+
+  const handleClick = (!isTbd && team && !locked) ? onPick : undefined;
 
   return (
-    <div className={cls.join(' ')} onClick={(!isTbd && team) ? onPick : undefined}>
+    <div className={cls.join(' ')} onClick={handleClick}>
       {team ? (
         <>
           <span className="seed-badge">{team.seed}</span>
           <span className="team-name">{team.name}</span>
           {isSelected && mode === 'results' && <span className="check-icon">‚úì</span>}
           {isCorrect && mode === 'picks' && <span className="correct-icon">‚òÖ</span>}
+          {locked && isSelected && <span className="lock-icon-sm">üîí</span>}
         </>
       ) : (
         <>
@@ -348,7 +407,7 @@ function TeamSlot({ team, isSelected, isEliminated, isTbd, onPick, mode, isCorre
   );
 }
 
-function GameCard({ gameId, picks, onPick, mode, results, style, cardStyle }) {
+function GameCard({ gameId, picks, onPick, mode, results, cardStyle, locked }) {
   const game = ALL_GAMES[gameId];
   if (!game) return null;
 
@@ -364,12 +423,14 @@ function GameCard({ gameId, picks, onPick, mode, results, style, cardStyle }) {
   const topCorrect     = mode === 'picks' && resultId && resultId === topTeam?.id && topSelected;
   const bottomCorrect  = mode === 'picks' && resultId && resultId === bottomTeam?.id && bottomSelected;
 
-  // Slots are tbd if team can't be resolved yet
   const topTbd    = !topTeam && !game.top;
   const bottomTbd = !bottomTeam && !game.bottom;
 
+  const cardCls = ['game-card'];
+  if (locked) cardCls.push('locked-card');
+
   return (
-    <div className="game-card" style={cardStyle}>
+    <div className={cardCls.join(' ')} style={cardStyle}>
       <TeamSlot
         team={topTeam}
         isSelected={topSelected}
@@ -377,6 +438,7 @@ function GameCard({ gameId, picks, onPick, mode, results, style, cardStyle }) {
         isTbd={topTbd}
         mode={mode}
         isCorrect={topCorrect}
+        locked={locked}
         onPick={() => topTeam && onPick(gameId, topTeam.id)}
       />
       <TeamSlot
@@ -386,6 +448,7 @@ function GameCard({ gameId, picks, onPick, mode, results, style, cardStyle }) {
         isTbd={bottomTbd}
         mode={mode}
         isCorrect={bottomCorrect}
+        locked={locked}
         onPick={() => bottomTeam && onPick(gameId, bottomTeam.id)}
       />
     </div>
@@ -407,12 +470,14 @@ function ConnectorCol({ count, wrapperClass }) {
 }
 
 // ‚îÄ‚îÄ REGION BRACKET ‚îÄ‚îÄ
-function RegionBracket({ regionKey, picks, onPick, mode, results }) {
+function RegionBracket({ regionKey, picks, onPick, mode, results, playerLockedRounds, onLockRound }) {
   const region = REGIONS[regionKey];
   const { r64, r32, r16, r8, name, badge } = region;
 
+  const isLocked = (roundNum) => mode === 'picks' && (playerLockedRounds || []).includes(roundNum);
+  const showLock = (roundNum) => mode === 'picks' && !isLocked(roundNum);
+
   const e8Winner = getWinner(r8, picks);
-  const e8ResultWinner = getWinner(r8, results);
 
   return (
     <div>
@@ -420,7 +485,7 @@ function RegionBracket({ regionKey, picks, onPick, mode, results }) {
         <span className={`region-name-badge ${badge}`}>{name} Region</span>
         {e8Winner && (
           <span className="champion-name">
-            Regional picks leader: <strong style={{color:'#e0e6ff'}}>{e8Winner.name}</strong>
+            Regional pick: <strong style={{color:'#e0e6ff'}}>{e8Winner.name}</strong>
           </span>
         )}
       </div>
@@ -428,54 +493,59 @@ function RegionBracket({ regionKey, picks, onPick, mode, results }) {
         {/* R64 Column */}
         <div>
           <div className="round-label">R64</div>
+          {isLocked(1) && <span className="locked-badge">üîí Locked</span>}
+          {showLock(1) && <button className="lock-btn" onClick={() => onLockRound(1)}>üîí Lock R64</button>}
           <div className="round-col">
             {r64.map(gid => (
               <div key={gid} className="game-wrapper r64">
-                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} />
+                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} locked={isLocked(1)} />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Connector r64‚Üír32 */}
         <ConnectorCol count={4} wrapperClass="r64" />
 
         {/* R32 Column */}
         <div>
           <div className="round-label">R32</div>
+          {isLocked(2) && <span className="locked-badge">üîí Locked</span>}
+          {showLock(2) && <button className="lock-btn" onClick={() => onLockRound(2)}>üîí Lock R32</button>}
           <div className="round-col">
             {r32.map(gid => (
               <div key={gid} className="game-wrapper r32">
-                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} />
+                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} locked={isLocked(2)} />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Connector r32‚Üír16 */}
         <ConnectorCol count={2} wrapperClass="r32" />
 
         {/* S16 Column */}
         <div>
           <div className="round-label">Sweet 16</div>
+          {isLocked(3) && <span className="locked-badge">üîí Locked</span>}
+          {showLock(3) && <button className="lock-btn" onClick={() => onLockRound(3)}>üîí Lock S16</button>}
           <div className="round-col">
             {r16.map(gid => (
               <div key={gid} className="game-wrapper r16">
-                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} />
+                <GameCard gameId={gid} picks={picks} onPick={onPick} mode={mode} results={results} locked={isLocked(3)} />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Connector r16‚Üír8 */}
         <ConnectorCol count={1} wrapperClass="r16" />
 
         {/* E8 Column */}
         <div>
           <div className="round-label">Elite 8</div>
+          {isLocked(4) && <span className="locked-badge">üîí Locked</span>}
+          {showLock(4) && <button className="lock-btn" onClick={() => onLockRound(4)}>üîí Lock E8</button>}
           <div className="round-col">
             <div className="game-wrapper r8">
-              <GameCard gameId={r8} picks={picks} onPick={onPick} mode={mode} results={results} />
+              <GameCard gameId={r8} picks={picks} onPick={onPick} mode={mode} results={results} locked={isLocked(4)} />
             </div>
           </div>
         </div>
@@ -485,11 +555,18 @@ function RegionBracket({ regionKey, picks, onPick, mode, results }) {
 }
 
 // ‚îÄ‚îÄ FIRST FOUR VIEW ‚îÄ‚îÄ
-function FirstFourView({ picks, onPick, mode, results }) {
+function FirstFourView({ picks, onPick, mode, results, playerLockedRounds, onLockRound }) {
   const ffGames = ['ff1','ff2','ff3','ff4'];
+  const isLocked = mode === 'picks' && (playerLockedRounds || []).includes(0);
+  const showLock = mode === 'picks' && !isLocked;
+
   return (
     <div className="first-four-section">
-      <div className="first-four-title">‚ö° First Four ‚Äî Play-In Games (Dayton, OH)</div>
+      <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:10}}>
+        <div className="first-four-title" style={{marginBottom:0}}>‚ö° First Four ‚Äî Play-In Games (Dayton, OH)</div>
+        {isLocked && <span className="locked-badge" style={{display:'inline'}}>üîí Locked</span>}
+        {showLock && <button className="lock-btn" style={{display:'inline'}} onClick={() => onLockRound(0)}>üîí Lock First Four</button>}
+      </div>
       <div className="first-four-grid">
         {ffGames.map(gid => {
           const game = ALL_GAMES[gid];
@@ -502,6 +579,7 @@ function FirstFourView({ picks, onPick, mode, results }) {
                 onPick={onPick}
                 mode={mode}
                 results={results}
+                locked={isLocked}
               />
               <div className="ff-feeds">‚Üí feeds into {game.feederTo}</div>
             </div>
@@ -513,19 +591,28 @@ function FirstFourView({ picks, onPick, mode, results }) {
 }
 
 // ‚îÄ‚îÄ FINAL FOUR VIEW ‚îÄ‚îÄ
-function FinalFourView({ picks, onPick, mode, results }) {
+function FinalFourView({ picks, onPick, mode, results, playerLockedRounds, onLockRound }) {
+  const isLockedF4 = mode === 'picks' && (playerLockedRounds || []).includes(5);
+  const isLockedChamp = mode === 'picks' && (playerLockedRounds || []).includes(6);
+
   return (
     <div className="final-four-container">
       <div className="trophy">üèÜ</div>
 
       <div className="f4-layout">
         <div className="f4-side">
-          <div className="f4-label">Semifinal 1<br/><small style={{fontSize:'0.55rem',opacity:0.7}}>East vs West</small></div>
-          <GameCard gameId="f4-1" picks={picks} onPick={onPick} mode={mode} results={results} />
+          <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'center'}}>
+            <div className="f4-label" style={{marginBottom:0}}>Semifinal 1<br/><small style={{fontSize:'0.55rem',opacity:0.7}}>East vs West</small></div>
+          </div>
+          {isLockedF4 && <span className="locked-badge">üîí Locked</span>}
+          {!isLockedF4 && mode === 'picks' && <button className="lock-btn" onClick={() => onLockRound(5)}>üîí Lock F4</button>}
+          <GameCard gameId="f4-1" picks={picks} onPick={onPick} mode={mode} results={results} locked={isLockedF4} />
         </div>
 
-        <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:12}}>
+        <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:8}}>
           <div className="champ-label">üèÜ Championship<br/><small style={{fontSize:'0.6rem'}}>Apr 6 ¬∑ Indianapolis</small></div>
+          {isLockedChamp && <span className="locked-badge">üîí Locked</span>}
+          {!isLockedChamp && mode === 'picks' && <button className="lock-btn" onClick={() => onLockRound(6)}>üîí Lock Champ Pick</button>}
           <GameCard
             gameId="champ"
             picks={picks}
@@ -533,6 +620,7 @@ function FinalFourView({ picks, onPick, mode, results }) {
             mode={mode}
             results={results}
             cardStyle={{width:180}}
+            locked={isLockedChamp}
           />
           {picks['champ'] && (
             <div style={{fontSize:'0.75rem', color:'#facc15', fontWeight:700, textAlign:'center'}}>
@@ -542,8 +630,161 @@ function FinalFourView({ picks, onPick, mode, results }) {
         </div>
 
         <div className="f4-side">
-          <div className="f4-label">Semifinal 2<br/><small style={{fontSize:'0.55rem',opacity:0.7}}>South vs Midwest</small></div>
-          <GameCard gameId="f4-2" picks={picks} onPick={onPick} mode={mode} results={results} />
+          <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'center'}}>
+            <div className="f4-label" style={{marginBottom:0}}>Semifinal 2<br/><small style={{fontSize:'0.55rem',opacity:0.7}}>South vs Midwest</small></div>
+          </div>
+          {isLockedF4 && <span className="locked-badge">üîí Locked</span>}
+          {!isLockedF4 && mode === 'picks' && <button className="lock-btn" onClick={() => onLockRound(5)}>üîí Lock F4</button>}
+          <GameCard gameId="f4-2" picks={picks} onPick={onPick} mode={mode} results={results} locked={isLockedF4} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ‚îÄ‚îÄ OVERALL VIEW ‚îÄ‚îÄ
+function OverallView({ players, allPicks, results }) {
+  const ROUND_ORDER = [0, 1, 2, 3, 4, 5, 6];
+
+  return (
+    <div className="overview-container">
+      {ROUND_ORDER.map(roundNum => {
+        const gamesInRound = Object.values(ALL_GAMES).filter(g => g.round === roundNum);
+        if (gamesInRound.length === 0) return null;
+
+        // Calculate round totals per player
+        const roundTotals = players.map((_, pi) => {
+          let net = 0;
+          gamesInRound.forEach(game => {
+            const resultId = results[game.id];
+            const pickId   = allPicks[pi]?.[game.id];
+            if (!resultId || !pickId) return;
+            if (resultId === pickId) net += (MONEY_CORRECT[roundNum] || 1);
+            else net -= (MONEY_WRONG[roundNum] || 2);
+          });
+          return net;
+        });
+
+        return (
+          <div key={roundNum} className="overview-round">
+            <div className="overview-round-title">
+              {ROUND_LABELS[roundNum]}
+              <span className="overview-round-meta">
+                ¬∑ {gamesInRound.length} game{gamesInRound.length > 1 ? 's' : ''}
+                ¬∑ correct: +${MONEY_CORRECT[roundNum]} / wrong: -${MONEY_WRONG[roundNum]}
+                {roundNum === 6 ? ' bonus' : ''}
+              </span>
+            </div>
+            <div className="overview-table-wrap">
+              <table className="overview-table">
+                <thead>
+                  <tr>
+                    <th className="ov-game-col">Game</th>
+                    {players.map((p, i) => <th key={i} className="ov-player-col">{p}</th>)}
+                    <th className="ov-result-col">Actual Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gamesInRound.map(game => {
+                    const resultId = results[game.id];
+                    // Resolve teams using results for "actual" display
+                    const topActual    = getTeamForSlot(game.id, 'top', results);
+                    const bottomActual = getTeamForSlot(game.id, 'bottom', results);
+                    const resultTeam   = resultId
+                      ? (topActual?.id === resultId ? topActual : bottomActual?.id === resultId ? bottomActual : null)
+                      : null;
+
+                    return (
+                      <tr key={game.id}>
+                        <td className="ov-game-col">
+                          <div className="ov-teams">
+                            <span className="ov-team">
+                              {topActual
+                                ? <><span className="ov-seed">{topActual.seed}</span>{topActual.name}</>
+                                : <span style={{color:'#3a4a6a',fontStyle:'italic'}}>TBD</span>}
+                            </span>
+                            <span className="ov-vs">vs</span>
+                            <span className="ov-team">
+                              {bottomActual
+                                ? <><span className="ov-seed">{bottomActual.seed}</span>{bottomActual.name}</>
+                                : <span style={{color:'#3a4a6a',fontStyle:'italic'}}>TBD</span>}
+                            </span>
+                          </div>
+                        </td>
+                        {players.map((p, pi) => {
+                          const pickId = allPicks[pi]?.[game.id];
+                          // Resolve pick team using player's own picks for context
+                          const pTop    = getTeamForSlot(game.id, 'top', allPicks[pi] || {});
+                          const pBottom = getTeamForSlot(game.id, 'bottom', allPicks[pi] || {});
+                          const pickedTeam = pickId
+                            ? (pTop?.id === pickId ? pTop : pBottom?.id === pickId ? pBottom : null)
+                            : null;
+                          const correct = !!(resultId && pickId && resultId === pickId);
+                          const wrong   = !!(resultId && pickId && resultId !== pickId);
+                          const dollarAmt = correct
+                            ? (MONEY_CORRECT[roundNum] || 1)
+                            : wrong ? -(MONEY_WRONG[roundNum] || 2) : 0;
+
+                          return (
+                            <td key={pi} className={`ov-player-col ${correct ? 'ov-correct-cell' : wrong ? 'ov-wrong-cell' : ''}`}>
+                              {pickedTeam ? (
+                                <>
+                                  <span className="ov-pick-seed">{pickedTeam.seed}</span>
+                                  <span className={`ov-pick-name ${correct ? 'ov-pick-correct' : wrong ? 'ov-pick-wrong' : ''}`}>
+                                    {pickedTeam.name}
+                                  </span>
+                                  {correct && <span className="ov-dollar ov-dollar-pos">+${dollarAmt} ‚úì</span>}
+                                  {wrong && <span className="ov-dollar ov-dollar-neg">-${Math.abs(dollarAmt)} ‚úó</span>}
+                                </>
+                              ) : <span style={{color:'#3a4a6a'}}>‚Äî</span>}
+                            </td>
+                          );
+                        })}
+                        <td className="ov-result-col">
+                          {resultTeam
+                            ? <span style={{color:'#4ade80', fontWeight:700}}>
+                                <span style={{color:'#7a8aaa',fontSize:'0.6rem',marginRight:2}}>{resultTeam.seed}</span>
+                                {resultTeam.name}
+                              </span>
+                            : <span style={{color:'#3a4a6a'}}>‚Äî</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {/* Round totals row */}
+                  <tr className="ov-summary-row">
+                    <td style={{color:'#7a8aaa',fontSize:'0.65rem'}}>Round total</td>
+                    {roundTotals.map((net, i) => (
+                      <td key={i} style={{color: net > 0 ? '#4ade80' : net < 0 ? '#f87171' : '#7a8aaa', fontSize:'0.72rem'}}>
+                        {net !== 0 ? formatMoney(net) : '‚Äî'}
+                      </td>
+                    ))}
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Grand totals */}
+      <div style={{background:'#131929', border:'1px solid #facc1540', borderRadius:10, padding:'14px 16px'}}>
+        <div style={{fontSize:'0.75rem', fontWeight:800, color:'#facc15', marginBottom:10, textTransform:'uppercase', letterSpacing:'0.06em'}}>
+          üí∞ Overall Standings
+        </div>
+        <div style={{display:'flex', gap:16, flexWrap:'wrap'}}>
+          {players.map((name, i) => {
+            const { total } = calcScore(allPicks[i] || {}, results);
+            return (
+              <div key={i} style={{background:'#0d1523', border:'1px solid #1e2d4a', borderRadius:8, padding:'8px 14px', minWidth:100}}>
+                <div style={{fontSize:'0.7rem', color:'#7a8aaa', marginBottom:2}}>{name}</div>
+                <div style={{fontSize:'1.2rem', fontWeight:800, color: total > 0 ? '#4ade80' : total < 0 ? '#f87171' : '#7a8aaa'}}>
+                  {formatMoney(total)}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -553,39 +794,44 @@ function FinalFourView({ picks, onPick, mode, results }) {
 // ‚îÄ‚îÄ SCOREBOARD ‚îÄ‚îÄ
 function Scoreboard({ players, allPicks, results, onClose }) {
   const scores = players.map((name, i) => {
-    const { total, breakdown } = calcScore(allPicks[i] || {}, results);
+    const { total, byRound } = calcScore(allPicks[i] || {}, results);
     const picked = countPicks(allPicks[i] || {});
-    return { name, total, breakdown, picked };
+    return { name, total, byRound, picked };
   }).sort((a,b) => b.total - a.total);
 
-  const rankEmojis = ['ü•á','ü•à','ü•â'];
+  const rankEmojis  = ['ü•á','ü•à','ü•â'];
   const rankClasses = ['gold','silver','bronze'];
 
   return (
     <div className="scoreboard-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="scoreboard-card">
-        <div className="score-title">üìä Scoreboard</div>
-        <div className="score-sub">Based on actual results entered ¬∑ Max {Object.values(ROUND_POINTS).reduce((a,b) => a+b,0) * 3 + 32 + 16 + 8 + 4 + 2 + 1} pts</div>
+        <div className="score-title">üí∞ Scoreboard</div>
+        <div className="score-sub">Dollar amounts based on actual results entered</div>
         <div className="score-legend">
-          {Object.entries(ROUND_POINTS).map(([r, pts]) => (
-            <span key={r} className="score-legend-item">{ROUND_LABELS[r]}: {pts}pt{pts>1?'s':''}</span>
+          {Object.entries(MONEY_CORRECT).map(([r, pts]) => (
+            <span key={r} className="score-legend-item">
+              {ROUND_SHORT[r]}: +${pts} / -{MONEY_WRONG[r] > 0 ? '$'+MONEY_WRONG[r] : '$0'}
+            </span>
           ))}
         </div>
         {scores.map((s, i) => {
           const rankCls = i < 3 ? rankClasses[i] : '';
+          const totalCls = s.total > 0 ? 'pos' : s.total < 0 ? 'neg' : 'zero';
           return (
             <div key={s.name} className="score-row">
               <div className={`score-rank ${rankCls}`}>{i < 3 ? rankEmojis[i] : (i+1)}</div>
               <div style={{flex:1}}>
                 <div className="score-name">{s.name}</div>
                 <div className="score-breakdown">
-                  {Object.entries(s.breakdown).filter(([,v])=>v>0).map(([r,v]) =>
-                    `${ROUND_LABELS[r]}: ${v}pts`
-                  ).join('  ¬∑  ') || 'No points yet'}
+                  {Object.entries(s.byRound).length > 0
+                    ? Object.entries(s.byRound).map(([r, d]) =>
+                        `${ROUND_SHORT[r]}: ${d.correct}‚úì ${d.wrong || 0}‚úó (${formatMoney(d.net)})`
+                      ).join('  ¬∑  ')
+                    : 'No results yet'}
                 </div>
                 <div className="score-possible">{s.picked} / {totalPossiblePicks()} picks made</div>
               </div>
-              <div className="score-total">{s.total}</div>
+              <div className={`score-total ${totalCls}`}>{formatMoney(s.total)}</div>
             </div>
           );
         })}
@@ -611,6 +857,9 @@ function SetupScreen({ onStart }) {
       <div className="setup-card">
         <div className="setup-title">üèÄ March Madness 2026</div>
         <div className="setup-sub">NCAA Tournament Bracket Challenge ¬∑ Up to 5 players</div>
+        <div style={{fontSize:'0.75rem', color:'#7a8aaa', background:'#0d1523', border:'1px solid #1e2d4a', borderRadius:8, padding:'10px 14px', marginBottom:20, lineHeight:1.6}}>
+          üí∞ <strong style={{color:'#e0e6ff'}}>Scoring:</strong> R64/R32 +$1/-$2 ¬∑ Sweet 16/E8 +$5/-$10 ¬∑ Final Four +$10/-$10 ¬∑ Champion +$50
+        </div>
 
         {names.map((name, i) => (
           <div key={i} className={`player-row ${name.trim() ? 'active' : ''}`}>
@@ -639,13 +888,14 @@ function SetupScreen({ onStart }) {
 
 // ‚îÄ‚îÄ MAIN APP ‚îÄ‚îÄ
 function App() {
-  const [screen, setScreen] = useState('setup'); // 'setup' | 'bracket'
+  const [screen, setScreen] = useState('setup');
   const [players, setPlayers] = useState([]);
-  const [activeTab, setActiveTab] = useState(0); // 0..N-1 = players, N = results
+  const [activeTab, setActiveTab] = useState(0);
   const [activeRegion, setActiveRegion] = useState('firstfour');
-  const [allPicks, setAllPicks] = useState([]); // array of pick maps per player
-  const [results, setResults] = useState({});   // actual results map
+  const [allPicks, setAllPicks] = useState([]);
+  const [results, setResults] = useState({});
   const [showScore, setShowScore] = useState(false);
+  const [lockedRounds, setLockedRounds] = useState([]); // Array<number[]> per player
 
   // Load from localStorage
   useEffect(() => {
@@ -655,6 +905,7 @@ function App() {
         setPlayers(saved.players);
         setAllPicks(saved.allPicks || saved.players.map(() => ({})));
         setResults(saved.results || {});
+        setLockedRounds(saved.lockedRounds || saved.players.map(() => []));
         setScreen('bracket');
       }
     } catch(e) {}
@@ -663,44 +914,67 @@ function App() {
   // Save to localStorage
   useEffect(() => {
     if (screen === 'bracket') {
-      localStorage.setItem('mm2026', JSON.stringify({ players, allPicks, results }));
+      localStorage.setItem('mm2026', JSON.stringify({ players, allPicks, results, lockedRounds }));
     }
-  }, [players, allPicks, results, screen]);
+  }, [players, allPicks, results, lockedRounds, screen]);
 
   const handleStart = (validPlayers) => {
     setPlayers(validPlayers);
     setAllPicks(validPlayers.map(() => ({})));
     setResults({});
+    setLockedRounds(validPlayers.map(() => []));
     setActiveTab(0);
     setScreen('bracket');
   };
 
   const handleReset = () => {
-    if (confirm('Reset all picks and results? This cannot be undone.')) {
+    if (confirm('Reset all picks, results, and locks? This cannot be undone.')) {
       localStorage.removeItem('mm2026');
       setScreen('setup');
       setPlayers([]);
       setAllPicks([]);
       setResults({});
+      setLockedRounds([]);
     }
   };
 
   const isResultsMode = activeTab === players.length;
+  const isOverviewMode = activeTab === players.length + 1;
 
-  const currentPicks = isResultsMode ? results : (allPicks[activeTab] || {});
+  const currentPicks = isResultsMode ? results : isOverviewMode ? {} : (allPicks[activeTab] || {});
+
+  function clearDownstream(picksObj, changedGameId) {
+    Object.keys(ALL_GAMES).forEach(gid => {
+      const g = ALL_GAMES[gid];
+      if (g.topFrom === changedGameId || g.bottomFrom === changedGameId) {
+        const winnerId = picksObj[gid];
+        if (winnerId) {
+          const topTeam    = getTeamForSlot(gid, 'top', picksObj);
+          const bottomTeam = getTeamForSlot(gid, 'bottom', picksObj);
+          if ((!topTeam || topTeam.id !== winnerId) && (!bottomTeam || bottomTeam.id !== winnerId)) {
+            delete picksObj[gid];
+            clearDownstream(picksObj, gid);
+          }
+        }
+      }
+    });
+  }
 
   const handlePick = useCallback((gameId, teamId) => {
+    if (isOverviewMode) return;
     if (isResultsMode) {
       setResults(prev => {
         const next = { ...prev };
-        if (next[gameId] === teamId) delete next[gameId]; // toggle off
+        if (next[gameId] === teamId) delete next[gameId];
         else next[gameId] = teamId;
-        // Cascade: if a game winner changes, clear downstream picks
         clearDownstream(next, gameId);
         return next;
       });
     } else {
       const pi = activeTab;
+      // Check if this round is locked
+      const roundNum = ALL_GAMES[gameId]?.round;
+      if ((lockedRounds[pi] || []).includes(roundNum)) return;
       setAllPicks(prev => {
         const next = prev.map((p, i) => {
           if (i !== pi) return p;
@@ -713,41 +987,40 @@ function App() {
         return next;
       });
     }
-  }, [isResultsMode, activeTab]);
+  }, [isResultsMode, isOverviewMode, activeTab, lockedRounds]);
 
-  function clearDownstream(picksObj, changedGameId) {
-    // Find games that depend on changedGameId and clear their picks
-    Object.keys(ALL_GAMES).forEach(gid => {
-      const g = ALL_GAMES[gid];
-      if (g.topFrom === changedGameId || g.bottomFrom === changedGameId) {
-        const winnerId = picksObj[gid];
-        if (winnerId) {
-          // Check if the winner is still valid
-          const topTeam = getTeamForSlot(gid, 'top', picksObj);
-          const bottomTeam = getTeamForSlot(gid, 'bottom', picksObj);
-          if ((!topTeam || topTeam.id !== winnerId) && (!bottomTeam || bottomTeam.id !== winnerId)) {
-            delete picksObj[gid];
-            clearDownstream(picksObj, gid);
-          }
+  const handleLockRound = useCallback((roundNum) => {
+    if (isResultsMode || isOverviewMode) return;
+    const pi = activeTab;
+    if (confirm(`Lock your ${ROUND_LABELS[roundNum]} picks? You won't be able to change them.`)) {
+      setLockedRounds(prev => {
+        const next = [...prev];
+        if (!next[pi]) next[pi] = [];
+        if (!next[pi].includes(roundNum)) {
+          next[pi] = [...next[pi], roundNum];
         }
-      }
-    });
-  }
+        return next;
+      });
+    }
+  }, [isResultsMode, isOverviewMode, activeTab]);
 
   const regionTabs = [
-    { key: 'firstfour', label: '‚ö° First Four' },
-    { key: 'east',    label: 'East' },
-    { key: 'west',    label: 'West' },
-    { key: 'midwest', label: 'Midwest' },
-    { key: 'south',   label: 'South' },
-    { key: 'finalfour', label: 'üèÜ Final Four' },
+    { key: 'firstfour',  label: '‚ö° First Four' },
+    { key: 'east',       label: 'East' },
+    { key: 'west',       label: 'West' },
+    { key: 'midwest',    label: 'Midwest' },
+    { key: 'south',      label: 'South' },
+    { key: 'finalfour',  label: 'üèÜ Final Four' },
   ];
 
   const totalPicks = isResultsMode
     ? countPicks(results)
+    : isOverviewMode ? 0
     : countPicks(allPicks[activeTab] || {});
 
   const pct = Math.round((totalPicks / totalPossiblePicks()) * 100);
+
+  const playerLockedRounds = !isResultsMode && !isOverviewMode ? (lockedRounds[activeTab] || []) : [];
 
   if (screen === 'setup') return <SetupScreen onStart={handleStart} />;
 
@@ -766,76 +1039,109 @@ function App() {
         <div className="header-top">
           <div className="header-title">üèÄ March Madness 2026</div>
           <div className="header-actions">
-            <button className="btn-sm score-btn" onClick={() => setShowScore(true)}>üìä Scores</button>
+            <button className="btn-sm score-btn" onClick={() => setShowScore(true)}>üí∞ Scores</button>
             <button className="btn-sm" onClick={handleReset}>‚Ü∫ Reset</button>
           </div>
         </div>
 
         <div className="player-tabs">
-          {players.map((name, i) => (
-            <button
-              key={i}
-              className={`player-tab ${activeTab === i ? 'active' : ''}`}
-              onClick={() => setActiveTab(i)}
-            >
-              {name}
-            </button>
-          ))}
+          {players.map((name, i) => {
+            const { total } = calcScore(allPicks[i] || {}, results);
+            const lockedCount = (lockedRounds[i] || []).length;
+            return (
+              <button
+                key={i}
+                className={`player-tab ${activeTab === i ? 'active' : ''}`}
+                onClick={() => { setActiveTab(i); if (isOverviewMode || isResultsMode) setActiveRegion('firstfour'); }}
+              >
+                {name}
+                {Object.keys(results).length > 0 && (
+                  <span style={{marginLeft:5, fontSize:'0.7rem', color: total > 0 ? '#4ade80' : total < 0 ? '#f87171' : '#7a8aaa'}}>
+                    {formatMoney(total)}
+                  </span>
+                )}
+                {lockedCount > 0 && <span style={{marginLeft:4, fontSize:'0.6rem', color:'#facc15'}}>üîí{lockedCount}</span>}
+              </button>
+            );
+          })}
           <button
             className={`player-tab results-tab ${isResultsMode ? 'active' : ''}`}
-            onClick={() => setActiveTab(players.length)}
+            onClick={() => { setActiveTab(players.length); if (isOverviewMode) setActiveRegion('firstfour'); }}
           >
-            üìã Actual Results
+            üìã Results
           </button>
-        </div>
-
-        <div style={{padding:'6px 0 8px', display:'flex', alignItems:'center', gap:10}}>
-          <div className="progress-bar" style={{flex:1}}>
-            <div className="progress-fill" style={{width: pct + '%'}} />
-          </div>
-          <span style={{fontSize:'0.65rem', color:'#7a8aaa', whiteSpace:'nowrap'}}>
-            {isResultsMode ? 'Results' : players[activeTab]}: {totalPicks}/{totalPossiblePicks()} picks
-          </span>
-        </div>
-      </div>
-
-      <div className="region-nav">
-        {regionTabs.map(t => (
           <button
-            key={t.key}
-            className={`region-tab ${activeRegion === t.key ? 'active' : ''}`}
-            onClick={() => setActiveRegion(t.key)}
+            className={`player-tab ${isOverviewMode ? 'active' : ''}`}
+            style={isOverviewMode ? {background:'#3b1f60', borderColor:'#7c3aed', color:'#c084fc'} : {}}
+            onClick={() => setActiveTab(players.length + 1)}
           >
-            {t.label}
+            üìä All Picks
           </button>
-        ))}
+        </div>
+
+        {!isOverviewMode && (
+          <div style={{padding:'6px 0 8px', display:'flex', alignItems:'center', gap:10}}>
+            <div className="progress-bar" style={{flex:1}}>
+              <div className="progress-fill" style={{width: pct + '%'}} />
+            </div>
+            <span style={{fontSize:'0.65rem', color:'#7a8aaa', whiteSpace:'nowrap'}}>
+              {isResultsMode ? 'Results' : players[activeTab]}: {totalPicks}/{totalPossiblePicks()} picks
+            </span>
+          </div>
+        )}
       </div>
+
+      {!isOverviewMode && (
+        <div className="region-nav">
+          {regionTabs.map(t => (
+            <button
+              key={t.key}
+              className={`region-tab ${activeRegion === t.key ? 'active' : ''}`}
+              onClick={() => setActiveRegion(t.key)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="main-content">
-        {activeRegion === 'firstfour' && (
-          <FirstFourView
-            picks={currentPicks}
-            onPick={handlePick}
-            mode={isResultsMode ? 'results' : 'picks'}
-            results={results}
-          />
-        )}
-        {['east','west','midwest','south'].includes(activeRegion) && (
-          <RegionBracket
-            regionKey={activeRegion}
-            picks={currentPicks}
-            onPick={handlePick}
-            mode={isResultsMode ? 'results' : 'picks'}
-            results={results}
-          />
-        )}
-        {activeRegion === 'finalfour' && (
-          <FinalFourView
-            picks={currentPicks}
-            onPick={handlePick}
-            mode={isResultsMode ? 'results' : 'picks'}
-            results={results}
-          />
+        {isOverviewMode ? (
+          <OverallView players={players} allPicks={allPicks} results={results} />
+        ) : (
+          <>
+            {activeRegion === 'firstfour' && (
+              <FirstFourView
+                picks={currentPicks}
+                onPick={handlePick}
+                mode={isResultsMode ? 'results' : 'picks'}
+                results={results}
+                playerLockedRounds={playerLockedRounds}
+                onLockRound={handleLockRound}
+              />
+            )}
+            {['east','west','midwest','south'].includes(activeRegion) && (
+              <RegionBracket
+                regionKey={activeRegion}
+                picks={currentPicks}
+                onPick={handlePick}
+                mode={isResultsMode ? 'results' : 'picks'}
+                results={results}
+                playerLockedRounds={playerLockedRounds}
+                onLockRound={handleLockRound}
+              />
+            )}
+            {activeRegion === 'finalfour' && (
+              <FinalFourView
+                picks={currentPicks}
+                onPick={handlePick}
+                mode={isResultsMode ? 'results' : 'picks'}
+                results={results}
+                playerLockedRounds={playerLockedRounds}
+                onLockRound={handleLockRound}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
