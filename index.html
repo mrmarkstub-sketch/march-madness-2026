@@ -164,6 +164,61 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #3a4a6a; gap: 12px; }
 .round-section-label { font-size: 0.62rem; font-weight: 700; color: #3a4a6a; text-align: center; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
 
+/* ‚îÄ‚îÄ Mobile Responsive ‚îÄ‚îÄ */
+@media (max-width: 480px) {
+  /* Header */
+  .header { padding: 0 10px; }
+  .header-top { padding: 7px 0; }
+  .header-title { font-size: 0.85rem; }
+  .btn-sm { padding: 5px 9px; font-size: 0.72rem; }
+
+  /* Player tabs */
+  .player-tab { padding: 5px 10px; font-size: 0.72rem; }
+  .player-tabs { gap: 3px; }
+
+  /* Region nav */
+  .region-nav { padding: 6px 10px; gap: 3px; }
+  .region-tab { padding: 5px 10px; font-size: 0.72rem; }
+
+  /* Main content */
+  .main-content { padding: 10px; }
+
+  /* Bracket game cards ‚Äî narrower on mobile */
+  .game-card { width: 128px; }
+  .team-name { font-size: 0.66rem; }
+  .seed-badge { font-size: 0.55rem; width: 13px; }
+  .team-slot { padding: 4px 6px; min-height: 24px; gap: 4px; }
+
+  /* Game wrapper heights shrink proportionally */
+  .game-wrapper.r64 { min-height: 54px; height: 54px; }
+  .game-wrapper.r32 { min-height: 108px; height: 108px; }
+  .game-wrapper.r16 { min-height: 216px; height: 216px; }
+  .game-wrapper.r8  { min-height: 432px; height: 432px; }
+
+  /* Connector sizing */
+  .connector-pair.r64 { height: 108px; }
+  .connector-pair.r32 { height: 216px; }
+  .connector-pair.r16 { height: 432px; }
+
+  /* First Four grid ‚Äî 1 column on very small screens */
+  .first-four-grid { flex-direction: column; gap: 16px; }
+
+  /* Scoreboard */
+  .scoreboard-card { padding: 18px; }
+  .score-legend { grid-template-columns: 1fr; }
+
+  /* Overview */
+  .overview-table { font-size: 0.65rem; }
+  .overview-table th, .overview-table td { padding: 4px 7px; }
+  .ov-game-col { min-width: 110px; }
+  .ov-player-col, .ov-result-col { min-width: 75px; }
+  .ov-team { font-size: 0.62rem; }
+
+  /* Setup card */
+  .setup-card { padding: 24px 18px; }
+  .setup-title { font-size: 1.5rem; }
+}
+
 /* ‚îÄ‚îÄ Overview ‚îÄ‚îÄ */
 .overview-container { display: flex; flex-direction: column; gap: 20px; }
 .overview-round { background: #0d1523; border: 1px solid #1e2d4a; border-radius: 10px; overflow: hidden; }
